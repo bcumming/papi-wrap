@@ -1,19 +1,27 @@
-CXX=CC -g -O3 -mavx -fopenmp 
+# gnu toolchain
+CXX=CC g -O2 -mavx -fopenmp
+cc=cc -O2 -mavx -fopenmp
+
+# cray toolchain
 CXX=CC
+CC=cc -lcray-c++-rts
 
 PAPI_PATH=/project/csstaff/bcumming/repos/papi/install
 PAPI_LIB_PATH=/project/csstaff/bcumming/repos/papi/install/lib
 LDFLAGS=../libcscsperf.a $(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a
-IFLAGS=-I$(PAPI_PATH)/include -I../
+IFLAGS=-I$(PAPI_PATH)/include -I..
 
-#CXXFLAGS=-fopenmp $(IFLAGS) -D_USE_MPI
 CXXFLAGS=$(IFLAGS)
+CCFLAGS=$(IFLAGS)
 
-all: test
+all: matmul dot
 
-test: test.cpp
-	$(CXX) $(CXXFLAGS) test.cpp $(LDFLAGS) -o test
+matmul: matmul.cpp
+	$(CXX) $(CXXFLAGS) matmul.cpp $(LDFLAGS) -o matmul
+
+dot: dot.c
+	$(CC) $(CCFLAGS) dot.c $(LDFLAGS) -o dot
 
 clean:
-	rm -f test
+	rm -f dot matmul
 
