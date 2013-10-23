@@ -47,12 +47,9 @@ void Papi::init() {
     }
 
     // allow multiplexing
-    /*
-       if( PAPI_multiplex_init() != PAPI_OK ){
-           std::cerr << "Could not initialize the multiplexing in Papi." << std::endl;
-           exit(1);
-       }
-     */
+    if( PAPI_multiplex_init() != PAPI_OK ){
+        std::cerr << "Papi:: Could not initialize the multiplexing in Papi." << std::endl;
+    }
 
     // assume fixed thread affinity, otherwise this approach fails
     papi_error = PAPI_thread_init((long unsigned int (*)()) get_thread_num);
@@ -69,9 +66,8 @@ void Papi::init() {
     int num_hwcntrs, i;
     papi_error = num_hwcntrs = PAPI_num_counters();
     if (papi_error <= PAPI_OK){
-        std::cerr << "PAPI error : unable to determine number of hardware counters" << std::endl;
+        std::cerr << "PAPI:: unable to determine number of hardware counters" << std::endl;
         papi_print_error(papi_error);
-        exit(1);
     }
     if( debug_ )
         std::cerr << "PAPI:: there are " << num_hwcntrs

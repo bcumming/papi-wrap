@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "PapiEventSet.h"
+#include "Papi.h"
 #include "util.h"
 
 PapiEventSet::PapiEventSet(){
@@ -24,25 +25,27 @@ PapiEventSet::~PapiEventSet(){
 }
 
 bool PapiEventSet::initialize(){
-    int success=1;
     if( !initialized_ ){
-        #pragma omp parallel reduction( && : success )
+        int success(0);
+
+        // we have to use an addition reduction on the openmp clause below because
+        // the Cray C++ compiler has a bug when using & or && for reductions
+        #pragma omp parallel reduction( + : success )
         {
             int tid = get_thread_num();
-            if( PAPI_create_eventset(&eventSet_[tid]) != PAPI_OK ){
+            int status =  PAPI_create_eventset(&eventSet_[tid]);
+            if( status!=PAPI_OK ){
+                if(Papi::instance()->debug())
+                    std::cerr << "PAPI:: unable to initialize event set :: "
+                              << PAPI_strerror(status) << std::endl;
                 eventSet_[tid]=PAPI_NULL;
                 success=0;
             }else{
-                /* disable for now
-                if( PAPI_set_multiplex(eventSet_[tid])!=PAPI_OK ){
-                    std::cerr << "WARNING: unable to set multiplexing on event set" << std::endl;
-                }
-                */
                 success=1;
             }
         }
+        initialized_ = (success==get_max_threads()) ? true : false;
     }
-    initialized_ = success ? true : false;
     return initialized_;
 }
 
@@ -57,14 +60,20 @@ PapiEventSetReturn PapiEventSet::addEvent(int eid){
             return PESuninitialized;
 
     int success(0);
-    #pragma omp parallel reduction( && : success )
+    // we have to use an addition reduction on the openmp clause below because
+    // the Cray C++ compiler has a bug when using & or && for reductions
+    #pragma omp parallel reduction( + : success )
     {
         int tid = get_thread_num();
 
         int status = PAPI_add_event(eventSet_[tid], eid);
         success = (status==PAPI_OK) ? 1 : 0;
+
+        if(!success &&  Papi::instance()->debug())
+            std::cerr << "PAPI:: unable to add event to event set :: "
+                      << PAPI_strerror(status) << std::endl;
     }
-    if(success){
+    if(success == get_max_threads()){
         events_.push_back(eid);
         return PESsuccess;
     }
@@ -86,6 +95,9 @@ PapiEventSetReturn PapiEventSet::addEvent(std::string estr){
     int eid;
     int status = PAPI_event_name_to_code(const_cast<char *>(estr.c_str()), &eid);
     if(status!=PAPI_OK){
+        if(Papi::instance()->debug())
+            std::cerr << "PAPI:: unable to add event to event set :: "
+                      << PAPI_strerror(status) << std::endl;
         return PESerror;
     }
     return addEvent(eid);

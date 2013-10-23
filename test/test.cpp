@@ -8,9 +8,8 @@
 #include <mpi.h>
 #endif
 
-//const int N=4*1024;
-const int N=128;
-const int numOuter=5;
+const int N=1*1024;
+const int numOuter=1;
 
 int main(int argc, char **argv)
 {

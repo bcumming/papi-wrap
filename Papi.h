@@ -42,10 +42,11 @@ public:
         return eventSet_;
     }
 
+    bool debug() {return debug_;};
     void startCounters();
     void stopCounters();
     int numThreads() {return numThreads_;}
-    bool counting() { return counting_; }
+    bool counting()  {return counting_;}
 
 private:
     Papi(Papi const &) {}
