@@ -30,13 +30,11 @@ papi_wrap.o: papi_wrap.cpp papi_wrap.h $(HEADERS)
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 m_papi_wrap.o: m_papi_wrap.f90
-	$(F90) -c m_papi_wrap.f90 -o m_papi_wrap.o -em
+	$(F90) -c m_papi_wrap.f90 -o m_papi_wrap.o
 
 lib: Papi.o PapiEventSet.o PapiCollector.o PapiCollectors.o papi_wrap.o m_papi_wrap.o
 	ar rcs libpapi_wrap.a  $(LDFLAGS) $^
 
-
-
 clean:
-	rm -f *.o *.a
+	rm -f *.o *.a *.mod
 
