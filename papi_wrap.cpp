@@ -2,8 +2,14 @@
 #include <PapiCollectors.h>
 
 extern "C"
-int pw_new_collector(char *name){
+int pw_new_collector(const char *name){
     return PapiCollectors::instance()->addCollector(name);
+}
+
+extern "C"
+void pw_new_collector_fortran(const char *name, int name_length, int *handle){
+    std::string namestr(name, name_length);
+    *handle = pw_new_collector(namestr.c_str());
 }
 
 extern "C"
