@@ -11,7 +11,11 @@ PAPI_PATH=/project/csstaff/bcumming/repos/papi/install/
 PAPIWRAP_PATH=../
 PAPI_LIB_PATH=$(PAPI_PATH)/lib
 LDFLAGS=$(PAPIWRAP_PATH)/libpapi_wrap.a $(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a
-LDFLAGS_FORTRAN=-L$(PAPIWRAP_PATH) -lpapi_wrap -L$(PAPI_LIB_PATH) -lpapi -lpfm -L/opt/cray/cce/8.2.1/CC/x86-64/lib/x86-64/ -lcray-c++-rts
+
+LDFLAGS_FORTRAN=-L$(PAPIWRAP_PATH) -lpapi_wrap
+LDFLAGS_FORTRAN+=-L$(PAPI_LIB_PATH) -lpapi -lpfm
+LDFLAGS_FORTRAN+=-L/opt/cray/cce/8.2.1/CC/x86-64/lib/x86-64/ -lcray-c++-rts
+LDFLAGS_FORTRAN+=-I..
 
 IFLAGS=-I$(PAPI_PATH)/include -I..
 
@@ -29,7 +33,6 @@ dot: dot.c
 saxpy: saxpy.f90
 	$(F90) $(F90FLAGS) $(LDFLAGS_FORTRAN) saxpy.f90 -o saxpy
 
-
 clean:
-	rm -f dot matmul
+	rm -f dot matmul saxpy
 
