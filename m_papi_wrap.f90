@@ -46,8 +46,8 @@ contains
         use, intrinsic :: iso_c_binding
         implicit none
 
-        character, intent(in)         :: label*(*)
-        integer(c_int), intent(out)   :: handle
+        character, intent(in)          :: label*(*)
+        integer(c_int), intent(out)    :: handle
 
         call pw_new_collector_fortran(label, len(label), handle)
     end subroutine pw_new_collector
