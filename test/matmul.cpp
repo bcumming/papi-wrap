@@ -14,7 +14,6 @@ const int numOuter=10;
 
 int main(int argc, char **argv)
 {
-    int handle1 =  pw_new_collector("counter1");
     // set up MPI
     #ifdef _USEMPI
     int rank, size;
