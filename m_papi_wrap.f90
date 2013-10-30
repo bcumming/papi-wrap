@@ -34,6 +34,14 @@ interface
     end subroutine pw_stop_collector
 
     !---------------------------------------------------------------------------
+    subroutine pw_get_time(handle, t) &
+        bind (c, name='pw_get_time_fortran')
+            use, intrinsic :: iso_c_binding
+            integer(c_int), value, intent(in)     :: handle
+            real(c_double), intent(out)    :: t
+    end subroutine pw_get_time
+
+    !---------------------------------------------------------------------------
     subroutine pw_print() &
         bind (c, name='pw_print')
             use, intrinsic :: iso_c_binding
