@@ -4,7 +4,9 @@
 #include "Papi.h"
 #include "util.h"
 
-PapiEventSet::PapiEventSet(){
+PapiEventSet::PapiEventSet()
+    : initialized_(false)
+{
     numThreads_ = get_max_threads();
     // create NULL event set for each thread
     eventSet_.resize(numThreads_);
@@ -36,8 +38,8 @@ bool PapiEventSet::initialize(){
             int status =  PAPI_create_eventset(&eventSet_[tid]);
             if( status!=PAPI_OK ){
                 if(Papi::instance()->debug())
-                    std::cerr << "PAPI:: unable to initialize event set :: "
-                              << PAPI_strerror(status) << std::endl;
+                    Papi::instance()->fid() << "PAPI:: unable to initialize event set :: "
+                                            << PAPI_strerror(status) << std::endl;
                 eventSet_[tid]=PAPI_NULL;
                 success=0;
             }else{
@@ -55,9 +57,13 @@ bool PapiEventSet::isInitialized(){
 
 // add an event by passing event code
 PapiEventSetReturn PapiEventSet::addEvent(int eid){
-    if( !isInitialized() )
-        if( initialize()==false )
+    if( !isInitialized() ) {
+        if( initialize()==false ) {
+            Papi::instance()->fid() << "PAPI:: unable to initialize eventset "
+                                    <<  std::endl;
             return PESuninitialized;
+        }
+    }
 
     int success(0);
     // we have to use an addition reduction on the openmp clause below because
@@ -70,8 +76,8 @@ PapiEventSetReturn PapiEventSet::addEvent(int eid){
         success = (status==PAPI_OK) ? 1 : 0;
 
         if(!success &&  Papi::instance()->debug())
-            std::cerr << "PAPI:: unable to add event to event set :: "
-                      << PAPI_strerror(status) << std::endl;
+            Papi::instance()->fid() << "PAPI:: unable to add event to event set :: "
+                                    << PAPI_strerror(status) << std::endl;
     }
     if(success == get_max_threads()){
         events_.push_back(eid);
@@ -96,7 +102,7 @@ PapiEventSetReturn PapiEventSet::addEvent(std::string estr){
     int status = PAPI_event_name_to_code(const_cast<char *>(estr.c_str()), &eid);
     if(status!=PAPI_OK){
         if(Papi::instance()->debug())
-            std::cerr << "PAPI:: unable to add event to event set :: "
+            Papi::instance()->fid() << "PAPI:: unable to add event to event set :: "
                       << PAPI_strerror(status) << std::endl;
         return PESerror;
     }

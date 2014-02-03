@@ -19,13 +19,13 @@ static int get_thread_num() {
     return omp_get_thread_num();
 }
 #else
-static int get_num_threads() {
+static inline int get_num_threads() {
     return 1;
 }
-static int get_max_threads() {
+static inline int get_max_threads() {
     return 1;
 }
-static int get_thread_num() {
+static inline int get_thread_num() {
     return 0;
 }
 #endif

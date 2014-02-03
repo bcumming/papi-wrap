@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include <algorithm>
 
 #include <cstdlib>
@@ -9,6 +8,10 @@
 
 #include "Papi.h"
 #include "util.h"
+
+#ifdef WITH_MPI
+#include <mpi.h>
+#endif
 
 bool isNotPESsuccess(PapiEventSetReturn val) {
     return (val!=PESsuccess);
@@ -33,29 +36,47 @@ void Papi::init() {
 
     int papi_error;
 
+    #ifdef WITH_MPI
+    std::stringstream debug_fname;
+    debug_fname << "papi_debug";
+    int mpi_rank = -1;
+    int mpi_size = -1;
+
+    // assume that MPI has already been initialized...
+    MPI_Comm_size(MPI_COMM_WORLD,&mpi_size);
+    MPI_Comm_rank(MPI_COMM_WORLD,&mpi_rank);
+
+    // write to file
+    debug_fname << "_" << mpi_rank << "_" << mpi_size;
+    debug_fname << ".txt";
+    fid_.open(debug_fname.str().c_str());
+    #else
+    std::ostream &fid_ = std::cerr;
+    #endif
+
     // set debugging if requested by environment variable
     char *debugStr = getenv("CSCSPERF_DEBUG");
     debug_ = (debugStr != NULL);
     if(debug_)
-        std::cerr << "PAPI:: debug mode on" << std::endl;
+        fid_ << "PAPI:: debug mode on" << std::endl;
 
     // initialize the papi library */
     papi_error = PAPI_library_init(PAPI_VER_CURRENT);
     if (papi_error != PAPI_VER_CURRENT) {
-        std::cerr << "PAPI library init error!" << std::endl;
+        fid_ << "PAPI library init error!" << std::endl;
         exit(1);
     }
 
     // allow multiplexing
     if( PAPI_multiplex_init() != PAPI_OK ){
-        std::cerr << "Papi:: Could not initialize the multiplexing in Papi." << std::endl;
+        fid_ << "Papi:: Could not initialize the multiplexing in Papi." << std::endl;
     }
 
     // assume fixed thread affinity, otherwise this approach fails
     papi_error = PAPI_thread_init((long unsigned int (*)()) get_thread_num);
     if ( papi_error != PAPI_OK ){
-        std::cerr << "Could not initialize the library with with threading."
-            << std::endl;
+        fid_ << "Could not initialize the library with with threading."
+             << std::endl;
         exit(1);
     }
     numThreads_ = get_max_threads();
@@ -69,9 +90,9 @@ void Papi::init() {
         std::cerr << "PAPI:: unable to determine number of hardware counters" << std::endl;
         papi_print_error(papi_error);
     }
-    if( debug_ )
-        std::cerr << "PAPI:: there are " << num_hwcntrs
-                  << " hardware counters available" << std::endl;
+    //if( debug_ )
+        //std::cerr << "PAPI:: there are " << num_hwcntrs
+                  //<< " hardware counters available" << std::endl;
 
     // get user-defined list of hardware counters from environment variable CSCSPERF_EVENTS
     char *counter_str = getenv("CSCSPERF_EVENTS");
@@ -82,18 +103,19 @@ void Papi::init() {
     parseTokenString(papi_counters, events);
 
     if (debug_){
-        std::cerr << "PAPI:: CSCSPERF_EVENTS = " <<  papi_counters << std::endl;
-        std::cerr << "PAPI:: requested " << events.size() << " events" << std::endl;
+        fid_ << "PAPI:: CSCSPERF_EVENTS = " <<  papi_counters << std::endl;
+        fid_ << "PAPI:: requested " << events.size() << " events" << std::endl;
     }
 
     // add events to event set
+    eventSet_.initialize();
     for(int i=0; i<events.size(); i++){
         if( eventSet_.addEvent(events[i])==PESsuccess )
             events_.push_back(events[i]);
     }
 
     if (debug_){
-        std::cerr << "PAPI:: " <<  events_.size() << " events being monitored" << std::endl;
+        fid_ << "PAPI:: " <<  events_.size() << " events being monitored" << std::endl;
     }
 
     if(numEvents()==0){
@@ -117,7 +139,11 @@ void Papi::papi_print_error(int ierr) {
     PAPI_perror(ierr, errstring, PAPI_MAX_STR_LEN );
     #endif
 
+    #ifdef WITH_MPI
+    fid_ << "PAPI error " << errstring << std::endl;
+    #else
     std::cerr << "PAPI error " << errstring << std::endl;
+    #endif
 }
 
 void Papi::startCounters() {
@@ -129,8 +155,8 @@ void Papi::startCounters() {
         return;
     }
 
-    if(debug_)
-        std::cerr << "PAPI:: starting counters, " << events_.size() << " events being counted" << std::endl;
+    //if(debug_)
+        //std::cerr << "PAPI:: starting counters, " << events_.size() << " events being counted" << std::endl;
 
     #pragma omp parallel
     {
@@ -172,8 +198,8 @@ void Papi::stopCounters() {
     }
     counting_ = false;
 
-    if(debug_)
-        std::cerr << "PAPI:: counters stopped" << std::endl;
+    //if(debug_)
+        //std::cerr << "PAPI:: counters stopped" << std::endl;
 
 }
 

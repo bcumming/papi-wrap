@@ -61,11 +61,11 @@ void PapiCollectors::print()
     char *filename_cstr = getenv("CSCSPERF_FILENAME");
     char *printopts_cstr = getenv("CSCSPERF_PRINTOPTS");
 
-    std::cout << "--------------------------------------------------------------------------------" << std::endl;
+    Papi::instance()->fid() << "--------------------------------------------------------------------------------" << std::endl;
     for(int i=0; i<collectors_.size(); i++){
-        std::cout << "   Collector " << collector_names_[i] << " :: ";
+        Papi::instance()->fid() << "   Collector " << collector_names_[i] << " :: ";
         collectors_[i].print();
-        std::cout << "--------------------------------------------------------------------------------" << std::endl;
+        Papi::instance()->fid() << "--------------------------------------------------------------------------------" << std::endl;
     }
 }
 

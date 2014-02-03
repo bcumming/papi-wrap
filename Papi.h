@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <fstream>
 
 #include "PapiEventSet.h"
 
@@ -48,6 +49,12 @@ public:
     int numThreads() {return numThreads_;}
     bool counting()  {return counting_;}
 
+    #ifdef WITH_MPI
+    std::ofstream& fid() {return fid_;}
+    #else
+    std::ostream& fid() {return std::cerr;}
+    #endif
+
 private:
     Papi(Papi const &) {}
     Papi() {setup_=false; debug_=false; counting_=false;}
@@ -64,5 +71,9 @@ private:
     std::vector<std::vector<long long> > counters_;
 
     static Papi* instance_;
+
+    #ifdef WITH_MPI
+    std::ofstream fid_;
+    #endif
 };
 
