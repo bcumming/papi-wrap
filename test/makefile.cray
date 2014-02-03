@@ -33,6 +33,9 @@ dot: dot.c
 saxpy: saxpy.f90
 	$(F90) $(F90FLAGS) $(LDFLAGS_FORTRAN) saxpy.f90 -o saxpy
 
+static: static.c
+	$(CC) $(CCFLAGS) static.c $(LDFLAGS) -o static
+
 clean:
-	rm -f dot matmul saxpy
+	rm -f dot matmul saxpy static
 

@@ -1,0 +1,46 @@
+# gnu toolchain
+#CXX=CC g -O2 -mavx -fopenmp
+#cc=cc -O2 -mavx -fopenmp
+
+# cray toolchain
+CXX=CC
+CC=cc -lcray-c++-rts
+F90=ftn
+
+CC=bgxlc_r
+CXX=bgxlc++_r -qsmp=omp -qsimd=auto
+F90=bgxlf90_r  -qsmp=omp -qsimd=auto
+
+CCmpi=/bgsys/drivers/V1R2M1/ppc64/comm/bin/xl/mpixlc_r
+
+#CC=/bgsys/drivers/ppcfloor/gnu-linux/bin/powerpc64-bgq-linux-gcc -fopenmp
+#CXX=/bgsys/drivers/ppcfloor/gnu-linux/bin/powerpc64-bgq-linux-gcc -fopenmp
+#F90=/bgsys/drivers/ppcfloor/gnu-linux/bin/powerpc64-bgq-linux-gfortran -fopenmp
+
+PAPI_PATH=/gpfs/bbp.cscs.ch/home/cumming/install/papi
+PAPIWRAP_PATH=../
+PAPI_LIB_PATH=$(PAPI_PATH)/lib
+LDFLAGS=-L$(PAPI_LIB_PATH) -lpapi_wrap -L$(PAPIWRAP_PATH) -lpapi  -lrt -lstdc++
+
+IFLAGS=-I$(PAPI_PATH)/include -I..
+
+CXXFLAGS=$(IFLAGS)
+CCFLAGS=$(IFLAGS)
+
+all: matmul dot static
+
+matmul: matmul.cpp
+	$(CXX) $(CXXFLAGS) matmul.cpp $(LDFLAGS) -o matmul
+
+dot: dot.c
+	$(CC) $(CCFLAGS) dot.c $(LDFLAGS) -o dot
+
+static: static.c
+	$(CC) $(CCFLAGS) static.c $(LDFLAGS) -o static
+
+saxpy: saxpy.f90
+	$(F90) $(F90FLAGS) $(LDFLAGS) saxpy.f90 -o saxpy
+
+clean:
+	rm -f dot matmul saxpy
+

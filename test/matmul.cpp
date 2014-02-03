@@ -9,7 +9,7 @@
 #include <mpi.h>
 #endif
 
-const int N=4*1024;
+const int N=2*1024;
 const int numOuter=10;
 
 int main(int argc, char **argv)
@@ -21,6 +21,10 @@ int main(int argc, char **argv)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     std::cout << "hello world from rank " << rank << " of " << size << std::endl;
+    #endif
+
+    #ifdef _OPENMP
+    std::cout << "Using OpenMP :: " << omp_get_max_threads() << " threads" << std::endl;
     #endif
 
     // initialise data
@@ -53,7 +57,7 @@ int main(int argc, char **argv)
         PapiCollectors::instance()->start(handle_ij);
         #pragma omp parallel for
         for(int i=0; i<N; i++){
-            #pragma ivdep
+            //#pragma ivdep
             for(int j=0; j<N; j++)
                 yp[i] += Ap[i*N + j]*xp[j];
         }
