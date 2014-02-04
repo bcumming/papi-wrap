@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef PW_MPI
+#include <mpi.h>
+#endif
+
 #include "../papi_wrap.h"
 
 void foo() {
@@ -49,12 +53,26 @@ void foo() {
     printf("%g\n", sum);
 }
 
-int main(void){
+int main(int argc, char** argv){
     int i;
+
+    #ifdef PW_MPI
+    int size, rank;
+    MPI_Init(&argc,&argv);
+    MPI_Comm_size(MPI_COMM_WORLD,&size);
+    MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+    if(rank==0)
+        printf("MPI version: %d processes\n", size);
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
 
     for(i=0; i<10; ++i) foo();
 
     pw_print();
+
+    #ifdef PW_MPI
+    MPI_Finalize();
+    #endif
 
     return 0;
 }

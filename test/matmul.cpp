@@ -2,12 +2,12 @@
 #include <string>
 #include <iostream>
 
-#include "PapiCollectors.h"
-#include "papi_wrap.h"
-
-#ifdef _USEMPI
+#ifdef PW_MPI
 #include <mpi.h>
 #endif
+
+#include "PapiCollectors.h"
+#include "papi_wrap.h"
 
 const int N=2*1024;
 const int numOuter=10;
@@ -15,12 +15,14 @@ const int numOuter=10;
 int main(int argc, char **argv)
 {
     // set up MPI
-    #ifdef _USEMPI
+    #ifdef PW_MPI
     int rank, size;
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    std::cout << "hello world from rank " << rank << " of " << size << std::endl;
+    if(rank==0)
+        std::cout << "hello world from rank " << rank << " of " << size << std::endl;
+    MPI_Barrier(MPI_COMM_WORLD);
     #endif
 
     #ifdef _OPENMP
@@ -80,7 +82,7 @@ int main(int argc, char **argv)
     // write the counters to file, in plain text format
     //papiCounters.writeToFile(std::string("counters.txt"), fileFormatPlain);
 
-#ifdef _USEMPI
+#ifdef PW_MPI
     MPI_Finalize();
 #endif
 }

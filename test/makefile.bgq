@@ -11,6 +11,9 @@ CCFLAGS=-qsimd=auto
 ifdef PW_OPENMP
     CCFLAGS+=-qsmp=omp
 endif
+ifdef PW_MPI
+    CCFLAGS+=-DPW_MPI
+endif
 
 PAPI_PATH=/gpfs/bbp.cscs.ch/home/cumming/install/papi
 PAPIWRAP_PATH=../
