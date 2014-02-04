@@ -9,7 +9,7 @@
 #include "Papi.h"
 #include "util.h"
 
-#ifdef WITH_MPI
+#ifdef PW_MPI
 #include <mpi.h>
 #endif
 
@@ -36,7 +36,7 @@ void Papi::init() {
 
     int papi_error;
 
-    #ifdef WITH_MPI
+    #ifdef PW_MPI
     std::stringstream debug_fname;
     debug_fname << "papi_debug";
     int mpi_rank = -1;
@@ -139,7 +139,7 @@ void Papi::papi_print_error(int ierr) {
     PAPI_perror(ierr, errstring, PAPI_MAX_STR_LEN );
     #endif
 
-    #ifdef WITH_MPI
+    #ifdef PW_MPI
     fid_ << "PAPI error " << errstring << std::endl;
     #else
     std::cerr << "PAPI error " << errstring << std::endl;

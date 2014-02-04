@@ -1,26 +1,32 @@
-CXX=bgxlc++_r
-#CXX=mpixlcxx_r
-#CXX+=-qsmp=omp       # openmp 
+# choose whether to use MPI flags
+ifdef PW_MPI
+    CXX=mpixlcxx_r
+    F90=mpixf90_r
+else
+    CXX=bgxlc++_r
+    F90=bgxlf90_r
+endif
+ifdef PW_OPENMP
+    CXX+=-qsmp=omp
+    F90+=-qsmp=omp
+endif
 CXX+=-qnoeh          # turn off exception handling, which is required if linking against C
 CXX+=-qsuppress=1540-1088:1540-0700:1540-1090:1540-1101    # turning off exception handling raises all manner of warnings...
-F90=bgxlf90_r
-#F90+=-qsmp=omp
-#CXX=/bgsys/drivers/ppcfloor/gnu-linux/bin/powerpc64-bgq-linux-gcc -fopenmp
-#90=/bgsys/drivers/ppcfloor/gnu-linux/bin/powerpc64-bgq-linux-gfortran -fopenmp
 
 PAPI_PATH=/gpfs/bbp.cscs.ch/home/cumming/install/papi/
 PAPI_LIB_PATH=$(PAPI_PATH)/lib
-#LDFLAGS=$(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a
 LDFLAGS=$(PAPI_LIB_PATH)/libpapi.a
 IFLAGS=-I$(PAPI_PATH)/include -I.
 
-CXXFLAGS=$(IFLAGS) -DWITH_MPI
 CXXFLAGS=$(IFLAGS)
+ifdef PW_MPI
+    CXXFLAGS+=-DPW_MPI
+endif
 
 HEADERS=Papi.h util.h definitions.h PapiEventSet.h PapiCollector.h PapiCollectors.h
 
 
-all: lib m_papi_wrap.o
+all: lib
 
 Papi.o: Papi.cpp $(HEADERS)
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
@@ -34,13 +40,7 @@ PapiCollector.o: PapiCollector.cpp $(HEADERS)
 PapiCollectors.o: PapiCollectors.cpp $(HEADERS)
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-papi_wrap.o: papi_wrap.cpp papi_wrap.h $(HEADERS)
-	$(CXX) -c $(CXXFLAGS) -o $@ $<
-
-m_papi_wrap.o: m_papi_wrap.f90
-	$(F90) -c m_papi_wrap.f90 -o m_papi_wrap.o
-
-lib: Papi.o PapiEventSet.o PapiCollector.o PapiCollectors.o papi_wrap.o m_papi_wrap.o
+lib: Papi.o PapiEventSet.o PapiCollector.o PapiCollectors.o papi_wrap.o
 	ar rcs libpapi_wrap.a  $(LDFLAGS) $^
 
 clean:
