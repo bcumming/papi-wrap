@@ -7,7 +7,8 @@ CXX=CC
 CC=cc -lcray-c++-rts
 F90=ftn
 
-PAPI_PATH=/project/csstaff/bcumming/repos/papi/install/
+#PAPI_PATH=/project/csstaff/bcumming/repos/papi/install/
+PAPI_PATH=/scratch/santis/bcumming/papi
 PAPIWRAP_PATH=../
 PAPI_LIB_PATH=$(PAPI_PATH)/lib
 LDFLAGS=$(PAPIWRAP_PATH)/libpapi_wrap.a $(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a
@@ -22,7 +23,7 @@ IFLAGS=-I$(PAPI_PATH)/include -I..
 CXXFLAGS=$(IFLAGS)
 CCFLAGS=$(IFLAGS)
 
-all: matmul dot saxpy
+all: matmul dot saxpy stream
 
 matmul: matmul.cpp
 	$(CXX) $(CXXFLAGS) matmul.cpp $(LDFLAGS) -o matmul
@@ -36,6 +37,9 @@ saxpy: saxpy.f90
 static: static.c
 	$(CC) $(CCFLAGS) static.c $(LDFLAGS) -o static
 
+stream: stream.cu
+	nvcc -arch=sm_35 $(CCFLAGS) stream.cu $(LDFLAGS) -o stream
+
 clean:
-	rm -f dot matmul saxpy static
+	rm -f dot matmul saxpy static stream
 
