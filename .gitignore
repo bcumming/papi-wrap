@@ -1,0 +1,14 @@
+*.o
+*.swp
+*.swn
+*.swo
+*.sh
+
+stream
+static
+matmul
+saxpy
+
+makefile
+
+tmp
