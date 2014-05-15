@@ -11,7 +11,7 @@ F90=ftn -O2 -fopenmp
 PAPI_PATH=/opt/cray/papi/5.3.0
 PAPIWRAP_PATH=../
 PAPI_LIB_PATH=$(PAPI_PATH)/lib
-LDFLAGS=$(PAPIWRAP_PATH)/libpapi_wrap.a $(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a
+LDFLAGS=$(PAPIWRAP_PATH)/libpapi_wrap.a $(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a -lstdc++
 
 LDFLAGS_FORTRAN=-L$(PAPIWRAP_PATH) -lpapi_wrap
 LDFLAGS_FORTRAN+=-L$(PAPI_LIB_PATH) -lpapi -lpfm

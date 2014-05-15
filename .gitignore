@@ -10,6 +10,7 @@ stream
 static
 matmul
 saxpy
+dot
 
 makefile
 
