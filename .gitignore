@@ -1,4 +1,6 @@
 *.o
+*.a
+
 *.swp
 *.swn
 *.swo
@@ -12,3 +14,4 @@ saxpy
 makefile
 
 tmp
+

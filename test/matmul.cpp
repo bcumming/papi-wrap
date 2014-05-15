@@ -41,8 +41,10 @@ int main(int argc, char **argv)
         x[i] = 1.;
 
     // create Papi counters
-    int handle_ij = PapiCollectors::instance()->addCollector("IJLoop");
-    int handle_ji = PapiCollectors::instance()->addCollector("JILoop");
+    //int handle_ij = PapiCollectors::instance()->addCollector("IJLoop");
+    //int handle_ji = PapiCollectors::instance()->addCollector("JILoop");
+    int handle_ij = pw_new_collector("IJLoop");
+    int handle_ji = pw_new_collector("JILoop");
 
     const long long numFlops = N*N*2;
     std::cout << "FLOPs per iteration :: " << numFlops << std::endl;
@@ -56,32 +58,37 @@ int main(int argc, char **argv)
     for(int outer=0; outer<numOuter; outer++){
         // matrix-vector multiply IJ order
         // matix traversal is stride 1
-        PapiCollectors::instance()->start(handle_ij);
+        //PapiCollectors::instance()->start(handle_ij);
+        pw_start_collector(handle_ij);
         #pragma omp parallel for
         for(int i=0; i<N; i++){
             //#pragma ivdep
             for(int j=0; j<N; j++)
                 yp[i] += Ap[i*N + j]*xp[j];
         }
-        PapiCollectors::instance()->stop(handle_ij);
+        //PapiCollectors::instance()->stop(handle_ij);
+        pw_stop_collector(handle_ij);
 
         // matrix-vector multiply JI order
         // matix traversal is stride N
-        PapiCollectors::instance()->start(handle_ji);
+        //PapiCollectors::instance()->start(handle_ji);
+        pw_start_collector(handle_ji);
         #pragma omp parallel for
         for(int j=0; j<N; j++){
             for(int i=0; i<N; i++)
                 yp[i] += Ap[i*N + j]*xp[j];
         }
-        PapiCollectors::instance()->stop(handle_ji);
+        //PapiCollectors::instance()->stop(handle_ji);
+        pw_stop_collector(handle_ji);
 
     }
     // print the counters to std::out
-    PapiCollectors::instance()->print();
+    //PapiCollectors::instance()->print();
 
     // write the counters to file, in plain text format
     //papiCounters.writeToFile(std::string("counters.txt"), fileFormatPlain);
 
+    pw_print();
 #ifdef PW_MPI
     MPI_Finalize();
 #endif

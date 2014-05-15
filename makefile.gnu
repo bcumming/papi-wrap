@@ -1,9 +1,8 @@
 CXX=g++
 F90=ftn
 
-#PAPI_PATH=/project/csstaff/bcumming/repos/papi/install
-PAPI_PATH=/scratch/santis/bcumming/papi/
-PAPI_LIB_PATH=/project/csstaff/bcumming/repos/papi/install/lib
+PAPI_PATH=/opt/cray/papi/5.3.0
+PAPI_LIB_PATH=$(PAPI_PATH)/lib
 LDFLAGS=$(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a
 IFLAGS=-I$(PAPI_PATH)/include -I.
 
