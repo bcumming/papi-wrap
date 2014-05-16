@@ -1,12 +1,12 @@
-CXX=g++
-F90=ftn
+CXX=icpc
+F90=ifort
 
 PAPI_PATH=/opt/cray/papi/5.3.0
 PAPI_LIB_PATH=$(PAPI_PATH)/lib
 LDFLAGS=$(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a
 IFLAGS=-I$(PAPI_PATH)/include -I.
 
-CXXFLAGS=$(IFLAGS) -fopenmp
+CXXFLAGS=$(IFLAGS) -openmp
 
 HEADERS=Papi.h util.h definitions.h PapiEventSet.h PapiCollector.h PapiCollectors.h
 

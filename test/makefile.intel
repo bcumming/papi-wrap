@@ -1,0 +1,38 @@
+# intel toolchain
+CXX=icpc -g -O2 -mavx -fopenmp
+CC=icc -O2 -mavx -fopenmp
+F90=ifort -O2 -fopenmp
+
+PAPI_PATH=/opt/cray/papi/5.3.0
+PAPIWRAP_PATH=../
+PAPI_LIB_PATH=$(PAPI_PATH)/lib
+LDFLAGS=$(PAPIWRAP_PATH)/libpapi_wrap.a $(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a -lstdc++
+
+LDFLAGS_FORTRAN=-L$(PAPIWRAP_PATH) -lpapi_wrap
+LDFLAGS_FORTRAN+=-L$(PAPI_LIB_PATH) -lpapi -lpfm
+
+IFLAGS=-I$(PAPI_PATH)/include -I..
+
+CXXFLAGS=$(IFLAGS) -openmp
+CCFLAGS=$(IFLAGS) -openmp
+
+all: matmul dot saxpy stream
+
+matmul: matmul.cpp
+	$(CXX) $(CXXFLAGS) matmul.cpp $(LDFLAGS) -o matmul
+
+dot: dot.c
+	$(CC) $(CCFLAGS) dot.c $(LDFLAGS) -o dot
+
+saxpy: saxpy.f90
+	$(F90) $(F90FLAGS) $(LDFLAGS_FORTRAN) saxpy.f90 -o saxpy
+
+static: static.c
+	$(CC) $(CCFLAGS) static.c $(LDFLAGS) -o static
+
+stream: stream.cu
+	nvcc -arch=sm_35 $(CCFLAGS) stream.cu $(LDFLAGS) -o stream
+
+clean:
+	rm -f dot matmul saxpy static stream
+
