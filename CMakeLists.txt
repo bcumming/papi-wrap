@@ -5,8 +5,8 @@ enable_language( CXX )
 
 
 # Optionally include CUDA
-set( USE_GPU "OFF" CACHE BOOL "Compile with GPU support (CUDA)" )
-if( "${USE_GPU}" STREQUAL "ON" )
+set( PAPI_WRAP_USE_GPU "OFF" CACHE BOOL "Compile with GPU support (CUDA)" )
+if( "${PAPI_WRAP_USE_GPU}" STREQUAL "ON" )
   find_package(CUDA REQUIRED)
   include_directories(SYSTEM ${CUDA_INCLUDE_DIRS})
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_USE_GPU_")
@@ -40,9 +40,9 @@ set( CMAKE_CXX_ARCHIVE_APPEND "${PAPI_LIB_PATH}/libpapi.a" )
 
 add_library( papi_wrap Papi.cpp PapiEventSet.cpp PapiCollectors.cpp PapiCollector.cpp papi_wrap.cpp )
 
-set ( COMPILE_TESTS "OFF" CACHE BOOL "Set to on if you want to compile the tests" )
+set ( PAPI_WRAP_COMPILE_TESTS "OFF" CACHE BOOL "Set to on if you want to compile the tests" )
 
-if ( ${COMPILE_TESTS} )
+if ( ${PAPI_WRAP_COMPILE_TESTS} )
    add_executable( matmul test/matmul.cpp )
    
    target_link_libraries( matmul papi_wrap ${CUDA_LIBRARY_NAMES} papi )
