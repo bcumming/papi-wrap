@@ -7,6 +7,10 @@
 #include <string>
 #include <iomanip>
 
+#ifdef NOPAPI
+#include <sys/time.h>
+#endif
+
 #ifdef _OPENMP
 #include <omp.h>
 static int get_num_threads() {
@@ -127,11 +131,16 @@ int findString(std::vector<std::string> const& strVec, std::string str){
 // return time
 static double getTime()
 {
+#ifdef NOPAPI
+    return omp_get_wtime();
+#else
     return double(PAPI_get_real_usec())*1.e-6;
+#endif
 }
 
 static void parseTokenString(const std::string &str, std::vector<int> &events)
 {
+#ifndef NOPAPI
     std::vector<std::string> tokens(splitString(str, '|'));
     for(int i=0; i<tokens.size(); i++) {
         int eid;
@@ -139,6 +148,7 @@ static void parseTokenString(const std::string &str, std::vector<int> &events)
         if(status == PAPI_OK)
             events.push_back(eid);
     }
+#endif
 }
 
 /*
