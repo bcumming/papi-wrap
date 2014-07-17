@@ -2,7 +2,7 @@
 
 #include "util.h"
 #include "definitions.h"
-#include "outstreams.h"
+#include "OutStreams.h"
 
 // constructor
 PapiCollector::PapiCollector()
