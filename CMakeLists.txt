@@ -42,9 +42,9 @@ set( PAPI_WRAP_DO_NOT_USE_PAPI "ON" CACHE BOOL "Set to on to not use PAPI and ju
 
 if (${PAPI_WRAP_DO_NOT_USE_PAPI})
   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOPAPI" )
-  add_library( papi_wrap PapiCollectors.cpp PapiCollector_nopapi.cpp papi_wrap.cpp outstreams.cpp)
+  add_library( papi_wrap PapiCollectors.cpp PapiCollector_nopapi.cpp papi_wrap.cpp OutStreams.cpp)
 else()
-  add_library( papi_wrap Papi.cpp PapiEventSet.cpp PapiCollectors.cpp PapiCollector.cpp papi_wrap.cpp )
+  add_library( papi_wrap Papi.cpp PapiEventSet.cpp PapiCollectors.cpp PapiCollector.cpp papi_wrap.cpp OutStreams.cpp)
 endif()
 
 set ( PAPI_WRAP_COMPILE_TESTS "OFF" CACHE BOOL "Set to on if you want to compile the tests" )
