@@ -7,9 +7,12 @@
 #include <vector>
 #include <cstdlib>
 
+#ifndef NOPAPI
 #include "Papi.h"
-#include "PapiCollector.h"
+#endif
+#include "PapiCollectors.h"
 #include "util.h"
+#include "outstreams.h"
 
 PapiCollectors *PapiCollectors::instance_=0;
 PapiCollectors *PapiCollectors::instance()
@@ -61,11 +64,11 @@ void PapiCollectors::print()
     char *filename_cstr = getenv("CSCSPERF_FILENAME");
     char *printopts_cstr = getenv("CSCSPERF_PRINTOPTS");
 
-    Papi::instance()->fid() << "--------------------------------------------------------------------------------" << std::endl;
+    outstreams os;
+    os.fid() << "--------------------------------------------------------------------------------" << std::endl;
     for(int i=0; i<collectors_.size(); i++){
-        Papi::instance()->fid() << "   Collector " << collector_names_[i] << " :: ";
+        os.fid() << "   Collector " << collector_names_[i] << " :: ";
         collectors_[i].print();
-        Papi::instance()->fid() << "--------------------------------------------------------------------------------" << std::endl;
+        os.fid() << "--------------------------------------------------------------------------------" << std::endl;
     }
 }
-
