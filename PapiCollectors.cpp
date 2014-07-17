@@ -12,7 +12,7 @@
 #endif
 #include "PapiCollectors.h"
 #include "util.h"
-#include "outstreams.h"
+#include "OutStreams.h"
 
 PapiCollectors *PapiCollectors::instance_=0;
 PapiCollectors *PapiCollectors::instance()
