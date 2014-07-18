@@ -49,11 +49,6 @@ public:
     int numThreads() {return numThreads_;}
     bool counting()  {return counting_;}
 
-    #ifdef PW_MPI
-    std::ofstream& fid() {return fid_;}
-    #else
-    std::ostream& fid() {return std::cerr;}
-    #endif
 
 private:
     Papi(Papi const &) {}
@@ -72,8 +67,5 @@ private:
 
     static Papi* instance_;
 
-    #ifdef PW_MPI
-    std::ofstream fid_;
-    #endif
 };
 

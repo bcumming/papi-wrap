@@ -8,12 +8,15 @@ IFLAGS=-I$(PAPI_PATH)/include -I.
 
 CXXFLAGS=$(IFLAGS) -openmp
 
-HEADERS=Papi.h util.h definitions.h PapiEventSet.h PapiCollector.h PapiCollectors.h
+HEADERS=Papi.h util.h definitions.h PapiEventSet.h PapiCollector.h PapiCollectors.h OutStreams.h
 
 
 all: lib
 
 Papi.o: Papi.cpp $(HEADERS)
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+OutStreams.o: OutStreams.cpp $(HEADERS)
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 PapiEventSet.o: PapiEventSet.cpp $(HEADERS)
