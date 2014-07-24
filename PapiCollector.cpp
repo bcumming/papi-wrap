@@ -3,6 +3,7 @@
 #include "util.h"
 #include "definitions.h"
 #include "Papi.h"
+#include "OutStreams.h"
 
 // constructor
 PapiCollector::PapiCollector() {
@@ -81,30 +82,30 @@ void PapiCollector::print(){
     int numThreads=Papi::instance()->numThreads();
     int numEvents = Papi::instance()->numEvents();
 
-    Papi::instance()->fid() << "wall time " << time() << " seconds" << std::endl;
+    outstreams().fid() << "wall time " << time() << " seconds" << std::endl;
     if(numEvents>0){
         // print table headers
         if(numThreads>1){
             // only print per-thread values if there is more than one thread
             for(int tid=0; tid<numThreads; tid++){
-                Papi::instance()->fid() << "   THREAD" << std::setw(2) << tid;
+                outstreams().fid() << "   THREAD" << std::setw(2) << tid;
             }
         }
-        Papi::instance()->fid() << " [      TOTAL ]" << std::endl;
+        outstreams().fid() << " [      TOTAL ]" << std::endl;
 
         for(int i=0; i<numEvents; i++){
             // if we have more than one hardare thread first print individual
             // totals for each thread
             if(numThreads>1){
                 for(int tid=0; tid<numThreads; tid++){
-                    Papi::instance()->fid() << " " << std::setw(10) << count(tid, i);
+                    outstreams().fid() << " " << std::setw(10) << count(tid, i);
                 }
             }
             // print the cumulative total over all threads
-            Papi::instance()->fid() << " [ " << std::setw(10) << count(i) << " ]"
+            outstreams().fid() << " [ " << std::setw(10) << count(i) << " ]"
                                     << "\t" << eventName(i)  << std::endl;
         }
     }else{
-        Papi::instance()->fid()  << "PAPI-WRAP :: no hardware events to print" << std::endl;
+        outstreams().fid()  << "PAPI-WRAP :: no hardware events to print" << std::endl;
     }
 }

@@ -13,6 +13,8 @@
 #include <mpi.h>
 #endif
 
+#include "OutStreams.h"
+
 bool isNotPESsuccess(PapiEventSetReturn val) {
     return (val!=PESsuccess);
 }
@@ -40,24 +42,24 @@ void Papi::init() {
     char *debugStr = getenv("CSCSPERF_DEBUG");
     debug_ = (debugStr != NULL);
     if(debug_)
-        fid_ << "PAPI:: debug mode on" << std::endl;
+        outstreams().fid() << "PAPI:: debug mode on" << std::endl;
 
     // initialize the papi library */
     papi_error = PAPI_library_init(PAPI_VER_CURRENT);
     if (papi_error != PAPI_VER_CURRENT) {
-        fid_ << "PAPI library init error!" << std::endl;
+        outstreams().fid() << "PAPI library init error!" << std::endl;
         exit(1);
     }
 
     // allow multiplexing
     if( PAPI_multiplex_init() != PAPI_OK ){
-        fid_ << "Papi:: Could not initialize the multiplexing in Papi." << std::endl;
+        outstreams().fid() << "Papi:: Could not initialize the multiplexing in Papi." << std::endl;
     }
 
     // assume fixed thread affinity, otherwise this approach fails
     papi_error = PAPI_thread_init((long unsigned int (*)()) get_thread_num);
     if ( papi_error != PAPI_OK ){
-        fid_ << "Could not initialize the library with with threading."
+        outstreams().fid() << "Could not initialize the library with with threading."
              << std::endl;
         exit(1);
     }
@@ -85,8 +87,8 @@ void Papi::init() {
     parseTokenString(papi_counters, events);
 
     if (debug_){
-        fid_ << "PAPI:: CSCSPERF_EVENTS = " <<  papi_counters << std::endl;
-        fid_ << "PAPI:: requested " << events.size() << " events" << std::endl;
+        outstreams().fid() << "PAPI:: CSCSPERF_EVENTS = " <<  papi_counters << std::endl;
+        outstreams().fid() << "PAPI:: requested " << events.size() << " events" << std::endl;
     }
 
     // add events to event set
@@ -97,7 +99,7 @@ void Papi::init() {
     }
 
     if (debug_){
-        fid_ << "PAPI:: " <<  events_.size() << " events being monitored" << std::endl;
+        outstreams().fid() << "PAPI:: " <<  events_.size() << " events being monitored" << std::endl;
     }
 
     if(numEvents()==0){
@@ -122,7 +124,7 @@ void Papi::papi_print_error(int ierr) {
     #endif
 
     #ifdef PW_MPI
-    fid_ << "PAPI error " << errstring << std::endl;
+    outstreams().fid() << "PAPI error " << errstring << std::endl;
     #else
     std::cerr << "PAPI error " << errstring << std::endl;
     #endif

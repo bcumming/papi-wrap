@@ -3,6 +3,7 @@
 #include "PapiEventSet.h"
 #include "Papi.h"
 #include "util.h"
+#include "OutStreams.h"
 
 PapiEventSet::PapiEventSet()
     : initialized_(false)
@@ -38,7 +39,7 @@ bool PapiEventSet::initialize(){
             int status =  PAPI_create_eventset(&eventSet_[tid]);
             if( status!=PAPI_OK ){
                 if(Papi::instance()->debug())
-                    Papi::instance()->fid() << "PAPI:: unable to initialize event set :: "
+                    outstreams().fid() << "PAPI:: unable to initialize event set :: "
                                             << PAPI_strerror(status) << std::endl;
                 eventSet_[tid]=PAPI_NULL;
                 success=0;
@@ -59,7 +60,7 @@ bool PapiEventSet::isInitialized(){
 PapiEventSetReturn PapiEventSet::addEvent(int eid){
     if( !isInitialized() ) {
         if( initialize()==false ) {
-            Papi::instance()->fid() << "PAPI:: unable to initialize eventset "
+            outstreams().fid() << "PAPI:: unable to initialize eventset "
                                     <<  std::endl;
             return PESuninitialized;
         }
@@ -76,7 +77,7 @@ PapiEventSetReturn PapiEventSet::addEvent(int eid){
         success = (status==PAPI_OK) ? 1 : 0;
 
         if(!success &&  Papi::instance()->debug())
-            Papi::instance()->fid() << "PAPI:: unable to add event to event set :: "
+            outstreams().fid() << "PAPI:: unable to add event to event set :: "
                                     << PAPI_strerror(status) << std::endl;
     }
     if(success == get_max_threads()){
@@ -102,7 +103,7 @@ PapiEventSetReturn PapiEventSet::addEvent(std::string estr){
     int status = PAPI_event_name_to_code(const_cast<char *>(estr.c_str()), &eid);
     if(status!=PAPI_OK){
         if(Papi::instance()->debug())
-            Papi::instance()->fid() << "PAPI:: unable to add event to event set :: "
+            outstreams().fid() << "PAPI:: unable to add event to event set :: "
                       << PAPI_strerror(status) << std::endl;
         return PESerror;
     }
