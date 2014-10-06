@@ -9,6 +9,7 @@ void pw_start_collector(int handle);
 void pw_stop_collector(int handle);
 void pw_get_time_fortran(int handle, double *time);
 void pw_print();
+void pw_print_table();
 #ifdef __cplusplus
 }
 #endif

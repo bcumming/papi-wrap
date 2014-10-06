@@ -89,6 +89,7 @@ int main(int argc, char **argv)
     //papiCounters.writeToFile(std::string("counters.txt"), fileFormatPlain);
 
     pw_print();
+    pw_print_table();
 #ifdef PW_MPI
     MPI_Finalize();
 #endif

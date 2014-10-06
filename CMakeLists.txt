@@ -20,6 +20,11 @@ else()
   set (CUDA_LIBRARY_NAMES "")
 endif()
 
+set( PAPI_WRAP_USE_MPI "OFF" CACHE BOOL "Compile with MPI support" )
+if( "${PAPI_WRAP_USE_MPI}" STREQUAL "ON" )
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPW_MPI")
+endif()
+
 include(FindOpenMP)
 if(OPENMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")

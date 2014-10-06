@@ -17,6 +17,7 @@ public:
     static PapiCollectors* instance();
 
     void print();
+    void print_table();
 private:
     // disbale default and copy constructors for singleton
     PapiCollectors() {};

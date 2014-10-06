@@ -7,9 +7,9 @@ public:
     outstreams();
 
 #ifdef PW_MPI
-    std::ofstream& fid() const {return fid_;}
+    std::ofstream& fid() {return fid_;}
 #else
-    std::ostream& fid() const {return std::cerr;}
+    std::ostream& fid() {return std::cerr;}
 #endif
 
 private:

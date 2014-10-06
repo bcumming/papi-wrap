@@ -1,9 +1,14 @@
+#include <sstream>
+#ifdef PW_MPI
+#include <mpi.h>
+#endif
+
 #include "OutStreams.h"
 
 outstreams::outstreams() {
 #ifdef PW_MPI
     std::stringstream debug_fname;
-    debug_fname << "papi_debug";
+    debug_fname << "pw_output";
     int mpi_rank = -1;
     int mpi_size = -1;
 
@@ -15,6 +20,6 @@ outstreams::outstreams() {
     debug_fname << "_" << mpi_rank << "_" << mpi_size;
     debug_fname << ".txt";
     fid_.open(debug_fname.str().c_str());
-    #endif
+#endif
 }
 

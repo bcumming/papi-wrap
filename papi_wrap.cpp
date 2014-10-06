@@ -32,6 +32,11 @@ void pw_print(){
     PapiCollectors::instance()->print();
 }
 
+extern "C"
+void pw_print_table(){
+    PapiCollectors::instance()->print_table();
+}
+
 int pw_new_collector(char *name);
 void pw_start_collector(int handle);
 void pw_stop_collector(int handle);
