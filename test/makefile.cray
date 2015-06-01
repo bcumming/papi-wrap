@@ -1,22 +1,20 @@
-# gnu toolchain
-CXX=CC -g -O2 -mavx -fopenmp
-CC=cc -O2 -mavx -fopenmp
-F90=ftn -O2 -fopenmp
-
 # cray toolchain
-#CXX=CC
-#CC=cc -lcray-c++-rts
-#F90=ftn
+CXX=CC
+CC=cc -lcray-c++-rts
+F90=ftn
 
-PAPI_PATH=/opt/cray/papi/5.3.0
+
+PAPI_PATH=/opt/cray/papi/5.4.0.1
 PAPIWRAP_PATH=../
-PAPI_LIB_PATH=$(PAPI_PATH)/lib
-LDFLAGS=$(PAPIWRAP_PATH)/libpapi_wrap.a $(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a -lstdc++
+#PAPI_LIB_PATH=$(PAPI_PATH)/lib
+#LDFLAGS=$(PAPIWRAP_PATH)/libpapi_wrap.a $(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a -lstdc++
 
 LDFLAGS_FORTRAN=-L$(PAPIWRAP_PATH) -lpapi_wrap
-LDFLAGS_FORTRAN+=-L$(PAPI_LIB_PATH) -lpapi -lpfm
-#LDFLAGS_FORTRAN+=-L/opt/cray/cce/8.2.1/CC/x86-64/lib/x86-64/ -lcray-c++-rts
+#LDFLAGS_FORTRAN+=-L$(PAPI_LIB_PATH) -lpapi -lpfm
+LDFLAGS_FORTRAN+=-L/opt/cray/cce/8.2.1/CC/x86-64/lib/x86-64/ -lcray-c++-rts
 LDFLAGS_FORTRAN+=-I..
+
+LDFLAGS=-L$(PAPIWRAP_PATH) -lpapi_wrap
 
 IFLAGS=-I$(PAPI_PATH)/include -I..
 
