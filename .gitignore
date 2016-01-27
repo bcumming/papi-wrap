@@ -1,5 +1,6 @@
 *.o
 *.a
+*.mod
 
 *.swp
 *.swn

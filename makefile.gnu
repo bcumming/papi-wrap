@@ -1,8 +1,8 @@
-CXX=g++
+CXX=CC
 F90=ftn
 
-PAPI_PATH=/opt/cray/papi/5.3.0
-PAPI_LIB_PATH=$(PAPI_PATH)/lib
+PAPI_PATH=/opt/cray/papi/default
+PAPI_LIB_PATH=$(PAPI_PATH)/lib64
 LDFLAGS=$(PAPI_LIB_PATH)/libpapi.a $(PAPI_LIB_PATH)/libpfm.a
 IFLAGS=-I$(PAPI_PATH)/include -I.
 
@@ -31,7 +31,10 @@ PapiCollectors.o: PapiCollectors.cpp $(HEADERS)
 papi_wrap.o: papi_wrap.cpp papi_wrap.h $(HEADERS)
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-lib: Papi.o PapiEventSet.o PapiCollector.o PapiCollectors.o papi_wrap.o
+m_papi_wrap.o: m_papi_wrap.f90
+	$(F90) -c m_papi_wrap.f90 -o m_papi_wrap.o
+
+lib: Papi.o PapiEventSet.o PapiCollector.o PapiCollectors.o papi_wrap.o m_papi_wrap.o OutStreams.o
 	ar rcs libpapi_wrap.a  $(LDFLAGS) $^
 
 clean:
