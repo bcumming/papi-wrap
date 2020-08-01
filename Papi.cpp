@@ -69,7 +69,7 @@ void Papi::init() {
 
     // determine the number of hardware counters
     int num_hwcntrs;
-    papi_error = num_hwcntrs = PAPI_num_counters();
+    papi_error = num_hwcntrs = PAPI_num_hwctrs();
     if (papi_error <= PAPI_OK){
         std::cerr << "PAPI:: unable to determine number of hardware counters" << std::endl;
         papi_print_error(papi_error);
