@@ -68,8 +68,8 @@ void Papi::init() {
     timeVec_.resize(numThreads_);
 
     // determine the number of hardware counters
-    int num_hwcntrs, i;
-    papi_error = num_hwcntrs = PAPI_num_counters();
+    int num_hwcntrs;
+    papi_error = num_hwcntrs = PAPI_num_hwctrs();
     if (papi_error <= PAPI_OK){
         std::cerr << "PAPI:: unable to determine number of hardware counters" << std::endl;
         papi_print_error(papi_error);
