@@ -8,7 +8,7 @@
 #include <mpi.h>
 #endif
 
-#include "../papi_wrap.h"
+#include "papi_wrap.h"
 
 void foo() {
     static int papi_handle = -1;

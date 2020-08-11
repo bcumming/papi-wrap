@@ -1,8 +1,10 @@
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 3.12)
 
 project( PAPIWRAP )
 enable_language( CXX )
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+find_package(PAPI)
 
 # Optionally include CUDA
 set( PAPI_WRAP_USE_GPU "OFF" CACHE BOOL "Compile with GPU support (CUDA)" )
@@ -25,20 +27,16 @@ if( "${PAPI_WRAP_USE_MPI}" STREQUAL "ON" )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPW_MPI")
 endif()
 
-include(FindOpenMP)
-if(OPENMP_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif(OPENMP_FOUND)
+# pass PAPI_WRAP_USE_OPENMP = 0 to disable it
+if (NOT PAPI_WRAP_DO_NOT_USE_OPENMP)
+  include(FindOpenMP)
+endif()
 
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "XL")
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -qsuppress=1540-1088:1540-0700:1540-1090:1540-1101 -qnoeh")
 endif()
 
-set( PAPI_PATH "$ENV{PAPI_ROOT}" CACHE STRING "Path to papi library" )
-set( PAPI_LIB_PATH "${PAPI_PATH}" )
-
-include_directories( ${PAPI_PATH}/include . )
-link_directories( ${PAPI_PATH}/lib )
+include_directories( ${PAPI_INCLUDE_DIRS} ./include )
 
 set( LIBRARY_OUTPUT_PATH "lib")
 set( CMAKE_CXX_ARCHIVE_APPEND "${PAPI_LIB_PATH}/libpapi.a" )
@@ -51,15 +49,31 @@ if (${PAPI_WRAP_DO_NOT_USE_PAPI})
 else()
   add_library( papi_wrap Papi.cpp PapiEventSet.cpp PapiCollectors.cpp PapiCollector.cpp papi_wrap.cpp OutStreams.cpp)
 endif()
+target_link_libraries(papi_wrap PRIVATE ${PAPI_LIBRARIES})
+if(OPENMP_FOUND)
+  message("Linking openmp")
+  target_link_libraries(papi_wrap PRIVATE OpenMP::OpenMP_CXX)
+endif()
 
 set ( PAPI_WRAP_COMPILE_TESTS "OFF" CACHE BOOL "Set to on if you want to compile the tests" )
 
 if ( ${PAPI_WRAP_COMPILE_TESTS} )
     add_executable( matmul test/matmul.cpp )
+    add_executable( static test/static.c )
 
     if (${PAPI_WRAP_DO_NOT_USE_PAPI})
         target_link_libraries( matmul papi_wrap ${CUDA_LIBRARY_NAMES} )
+        target_link_libraries( static papi_wrap ${CUDA_LIBRARY_NAMES} )
     else()
-        target_link_libraries( matmul papi_wrap ${CUDA_LIBRARY_NAMES} papi )
+      target_link_libraries( matmul papi_wrap ${CUDA_LIBRARY_NAMES} ${PAPI_LIBRARIES} )
+      target_link_libraries( static papi_wrap ${CUDA_LIBRARY_NAMES} ${PAPI_LIBRARIES} )
     endif()
 endif()
+
+message("====================================================================================================")
+message("Papi-wrap usage : Remember to set (for example) \nexport CSCSPERF_EVENTS=\"PAPI_L1_DCM|PAPI_L2_DCM\"")
+message("Check CSCSPERF_FILENAME, CSCSPERF_PRINTOPTS, CSCSPERF_DEBUG, CSCSPERF_EVENTS")
+message("Turn off CMake var PAPI_WRAP_DO_NOT_USE_PAPI=OFF")
+message("Change permission for perf counting using \nsudo sysctl -w kernel.perf_event_paranoid=1")
+message("To persist across reboot : create /etc/sysctl.d/99-mysettings.conf with kernel.perf_event_paranoid=1")
+message("====================================================================================================")
