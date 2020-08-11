@@ -36,7 +36,7 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "XL")
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -qsuppress=1540-1088:1540-0700:1540-1090:1540-1101 -qnoeh")
 endif()
 
-include_directories( ${PAPI_INCLUDE_DIRS} . )
+include_directories( ${PAPI_INCLUDE_DIRS} ./include )
 
 set( LIBRARY_OUTPUT_PATH "lib")
 set( CMAKE_CXX_ARCHIVE_APPEND "${PAPI_LIB_PATH}/libpapi.a" )
